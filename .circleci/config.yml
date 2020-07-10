@@ -1,0 +1,23 @@
+version: 2.1
+
+workflows:
+  version: 2.1
+  dist-compile:
+    jobs:
+      - compile
+
+jobs:
+   compile:
+    parallelism: 1
+    docker:
+      - image: yaspl123/protobuf-ubuntu:1.0
+    steps:
+      - checkout
+      - run: apt-get update
+      - run: apt-get install -y cmake
+      - run: apt-get install -y libgtest-dev
+      - run: apt-get install -y libgmock-dev
+      - run: cmake .
+      - run: make tests
+      - run: ctest
+      - run: make
