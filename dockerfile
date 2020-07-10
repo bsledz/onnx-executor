@@ -5,6 +5,7 @@ WORKDIR ~
 COPY src src
 COPY proto proto
 COPY tests tests
+COPY example_models example_models
 
 COPY CMakeLists.txt CMakeLists.txt
 
