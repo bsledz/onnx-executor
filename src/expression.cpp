@@ -33,6 +33,7 @@ Expression::Expression(const onnx::GraphProto& graph, std::unordered_map<std::st
 
 double Expression::calculate(std::shared_ptr<double[]> inputs, int inputsCount)
 {
+    std::unordered_map<std::string, double> terms;
     if (inputsCount != this->inputsCount) {
         std::string msg = "The model requires " + std::to_string(this->inputsCount) + " inputs - given: " + std::to_string(inputsCount);
         throw InvalidInput(msg.c_str());
@@ -46,16 +47,20 @@ double Expression::calculate(std::shared_ptr<double[]> inputs, int inputsCount)
     for (int i = 0; i < operations.size(); i++) {
         operations[i].perform(terms);
     }
-
+    if (terms.find(outputIdentifer) == terms.end()) throw UnsupportedModel("The output value of the model has not been calculated - invalid model");
     return terms[outputIdentifer];
 }
 
-std::unique_ptr<Expression> Expression::fromIstream(std::istream& in, std::unordered_map<std::string, Operator> binaryOperators)
+std::unique_ptr<Expression> Expression::fromIstream(std::istream &in, onnx::ModelProto onnxModel, std::unordered_map<std::string, Operator> binaryOperators)
 {
-    onnx::ModelProto onnxModel;
     if(!onnxModel.ParseFromIstream(&in)){
-         throw InvalidInput("Unable to load onnx model from specified file");
+        throw InvalidInput("Unable to load onnx model from specified file");
     }
 
     return std::unique_ptr<Expression>(new Expression(onnxModel.graph(), binaryOperators));
+}
+
+std::unique_ptr<Expression> Expression::fromOnnxGraph(onnx::GraphProto onnxGraph, std::unordered_map<std::string, Operator> binaryOperators)
+{
+    return std::unique_ptr<Expression>(new Expression(onnxGraph, binaryOperators));
 }
