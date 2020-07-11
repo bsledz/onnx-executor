@@ -14,8 +14,8 @@ Expression::Expression(const onnx::GraphProto& graph, std::unordered_map<std::st
     outputIdentifer = graph.output()[0].name();
     inputsIdentifers = std::shared_ptr<std::string[]>(new std::string[inputsCount]);
 
-    for (int i = 0; i < graph.input_size(); i++) {
-        inputsIdentifers[i] = graph.input()[i].name();
+    for (int inputIndex = 0; inputIndex < graph.input_size(); inputIndex++) {
+        inputsIdentifers[inputIndex] = graph.input()[i].name();
     }
 
     operations.reserve(graph.node_size());
@@ -39,13 +39,13 @@ double Expression::calculate(std::shared_ptr<double[]> inputs, int inputsCount)
         throw InvalidInput(msg.c_str());
     }
 
-    for (int i = 0; i < inputsCount; i++) {
-        std::string termName = inputsIdentifers[i];
-        terms.insert({ termName, inputs[i] });
+    for (int inputIndex = 0; inputIndex < inputsCount; inputIndex++) {
+        std::string termName = inputsIdentifers[inputIndex];
+        terms.insert({ termName, inputs[inputIndex] });
     }
 
-    for (int i = 0; i < operations.size(); i++) {
-        operations[i].perform(terms);
+    for (int operationindex = 0; operationindex < operations.size(); operationindex++) {
+        operations[operationindex].perform(terms);
     }
     if (terms.find(outputIdentifer) == terms.end()) throw UnsupportedModel("The output value of the model has not been calculated - invalid model");
     return terms[outputIdentifer];
