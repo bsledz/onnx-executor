@@ -15,7 +15,7 @@ Expression::Expression(const onnx::GraphProto& graph, std::unordered_map<std::st
     inputsIdentifers = std::shared_ptr<std::string[]>(new std::string[inputsCount]);
 
     for (int inputIndex = 0; inputIndex < graph.input_size(); inputIndex++) {
-        inputsIdentifers[inputIndex] = graph.input()[i].name();
+        inputsIdentifers[inputIndex] = graph.input()[inputIndex].name();
     }
 
     operations.reserve(graph.node_size());
