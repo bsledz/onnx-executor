@@ -12,7 +12,8 @@ using Operator = std::function<double(double, double)>;
 
 TEST(test_operation, test_eval)
 {
-    std::shared_ptr<std::string[]> inputIdentifers(new std::string[2]);
+    std::shared_ptr<std::string[]> inputIdentifers = std::make_shared<std::string[]>(2);
+    
     inputIdentifers[0] = "A";
     inputIdentifers[1] = "B";
     Operation operation([](double l, double r) -> double {return l+r;}, inputIdentifers, 2, "Y");
@@ -25,7 +26,7 @@ TEST(test_operation, test_eval)
 
 TEST(test_operation, test_eval_too_much_inputs)
 {
-    std::shared_ptr<std::string[]> inputIdentifers(new std::string[3]);
+    std::shared_ptr<std::string[]> inputIdentifers = std::make_shared<std::string[]>(3);
     inputIdentifers[0] = "A";
     inputIdentifers[1] = "B";
     inputIdentifers[2] = "C";
@@ -94,7 +95,7 @@ TEST(test_expression, test_complex_flow)
     operators.insert({"Add", [](double l, double r) -> double {return l+r;}});
     operators.insert({"Div", [](double l, double r) -> double {return l/r;}});
     std::unique_ptr<Expression> expression(Expression::fromOnnxGraph(graph, operators));
-    std::shared_ptr<double[]> inputs(new double[3]);
+    std::shared_ptr<double[]> inputs = std::make_shared<double[]>(3);
     inputs[0] = 3.14159;
     inputs[1] = 2.718;
     inputs[2] = -6.02;
@@ -121,7 +122,7 @@ TEST(test_expression, test_bad_output_name)
     std::unordered_map<std::string, Operator> operators;
     operators.insert({"Add", [](double l, double r) -> double {return l+r;}});
     std::unique_ptr<Expression> expression(Expression::fromOnnxGraph(graph, operators));
-    std::shared_ptr<double[]> inputs(new double[2]);
+    std::shared_ptr<double[]> inputs = std::make_shared<double[]>(2);
     inputs[0] = 5;
     inputs[1] = 3.5;
     try{
@@ -150,7 +151,7 @@ TEST(test_expression, test_simple_flow)
     std::unordered_map<std::string, Operator> operators;
     operators.insert({"Add", [](double l, double r) -> double {return l+r;}});
     std::unique_ptr<Expression> expression(Expression::fromOnnxGraph(graph, operators));
-    std::shared_ptr<double[]> inputs(new double[2]);
+    std::shared_ptr<double[]> inputs = std::make_shared<double[]>(2);
     inputs[0] = 5;
     inputs[1] = 3.5;
     double val = expression->calculate(inputs, 2);

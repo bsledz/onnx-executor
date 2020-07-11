@@ -11,7 +11,8 @@
 
 using Operator = std::function<double(double, double)>;
 
-void parseAndValidateArguments(int argc, char** argv, std::shared_ptr<double[]> &inputs, int& inputsCount){
+void parseAndValidateArguments(int argc, char** argv, std::shared_ptr<double[]> &inputs, int& inputsCount)
+{
     if(argc < 2){
     	throw InvalidInput("Missing model path.");
     }
@@ -31,14 +32,16 @@ void parseAndValidateArguments(int argc, char** argv, std::shared_ptr<double[]> 
     }
 }
 
-std::unordered_map<std::string, Operator> createSupportedOperators(){
+std::unordered_map<std::string, Operator> createSupportedOperators()
+{
     std::unordered_map<std::string, Operator> operators;
     operators.insert({"Add", [](double l, double r) -> double {return l+r;}});
     operators.insert({"Div", [](double l, double r) -> double {return l/r;}});
     return operators;
 }
 
-int main(int argc, char** argv){
+int main(int argc, char** argv)
+{
     GOOGLE_PROTOBUF_VERIFY_VERSION;
     int inputsCount = 0;
     char** modelPath;

@@ -6,13 +6,14 @@
 #include "onnx.pb.h"
 #include "executorExceptions.h"
 
-Expression::Expression(const onnx::GraphProto& graph, std::unordered_map<std::string, Operator> binaryOperators) : inputsCount(graph.input_size()), binaryOperators(binaryOperators)
+Expression::Expression(const onnx::GraphProto& graph, std::unordered_map<std::string, Operator> binaryOperators) 
+: inputsCount(graph.input_size()), binaryOperators(binaryOperators)
 {
     if (graph.output_size() != 1) {
         throw UnsupportedModel("Only models with single output are supported");
     }
     outputIdentifer = graph.output()[0].name();
-    inputsIdentifers = std::shared_ptr<std::string[]>(new std::string[inputsCount]);
+    this->inputsIdentifers = std::make_shared<std::string[]>(inputsCount);
 
     for (int inputIndex = 0; inputIndex < graph.input_size(); inputIndex++) {
         inputsIdentifers[inputIndex] = graph.input()[inputIndex].name();
@@ -21,13 +22,15 @@ Expression::Expression(const onnx::GraphProto& graph, std::unordered_map<std::st
     operations.reserve(graph.node_size());
     for (int i = 0; i < graph.node_size(); i++) {
         auto node = graph.node()[i];
-        auto inputsIdentifers = std::shared_ptr<std::string[]>(new std::string[node.input_size()]);
-        for (int i = 0; i < node.input_size(); i++) {
-            inputsIdentifers[i] = node.input()[i];
-        }
-        if (binaryOperators.find(node.op_type()) == binaryOperators.end()) throw UnsupportedModel(("Operator "+node.op_type()+" is not supported").c_str());
+        if (binaryOperators.find(node.op_type()) == binaryOperators.end()) 
+            throw UnsupportedModel(("Operator "+node.op_type()+" is not supported").c_str());
+
+        auto nodeInputsIdentifers = std::make_shared<std::string[]>(node.input_size());
+        for (int i = 0; i < node.input_size(); i++) 
+            nodeInputsIdentifers[i] = node.input()[i];
+        
         auto operatorForOperation = binaryOperators[node.op_type()];
-        operations.push_back(Operation(operatorForOperation, inputsIdentifers, node.input_size(), node.output()[0]));
+        operations.push_back(Operation(operatorForOperation, nodeInputsIdentifers, node.input_size(), node.output()[0]));
     }
 }
 
@@ -57,10 +60,10 @@ std::unique_ptr<Expression> Expression::fromIstream(std::istream &in, onnx::Mode
         throw InvalidInput("Unable to load onnx model from specified file");
     }
 
-    return std::unique_ptr<Expression>(new Expression(onnxModel.graph(), binaryOperators));
+    return std::make_unique<Expression>(onnxModel.graph(), binaryOperators);
 }
 
 std::unique_ptr<Expression> Expression::fromOnnxGraph(onnx::GraphProto onnxGraph, std::unordered_map<std::string, Operator> binaryOperators)
 {
-    return std::unique_ptr<Expression>(new Expression(onnxGraph, binaryOperators));
+    return std::make_unique<Expression>(onnxGraph, binaryOperators));
 }
