@@ -6,7 +6,8 @@
 #include "onnx.pb.h"
 #include "executorExceptions.h"
 
-Expression::Expression(const onnx::GraphProto& graph, std::unordered_map<std::string, Operator> binaryOperators) : inputsCount(graph.input_size()), binaryOperators(binaryOperators)
+Expression::Expression(const onnx::GraphProto& graph, std::unordered_map<std::string, Operator> binaryOperators) 
+: inputsCount(graph.input_size()), binaryOperators(binaryOperators)
 {
     if (graph.output_size() != 1) {
         throw UnsupportedModel("Only models with single output are supported");
@@ -19,15 +20,16 @@ Expression::Expression(const onnx::GraphProto& graph, std::unordered_map<std::st
     }
 
     operations.reserve(graph.node_size());
-    for (int i = 0; i < graph.node_size(); i++) {
-        auto node = graph.node()[i];
-        auto inputsIdentifers = std::shared_ptr<std::string[]>(new std::string[node.input_size()]);
-        for (int i = 0; i < node.input_size(); i++) {
-            inputsIdentifers[i] = node.input()[i];
-        }
+    for (int nodeIndex = 0; nodeIndex < graph.node_size(); nodeIndex++) {
+        auto node = graph.node()[nodeIndex];
         if (binaryOperators.find(node.op_type()) == binaryOperators.end()) throw UnsupportedModel(("Operator "+node.op_type()+" is not supported").c_str());
+        auto nodeInputsIdentifers = std::shared_ptr<std::string[]>(new std::string[node.input_size()]);
+        for (int nodeInputIndex = 0; nodeInputIndex < node.input_size(); nodeInputIndex++) {
+            nodeInputsIdentifers[nodeInputIndex] = node.input()[nodeInputIndex];
+        }
+        
         auto operatorForOperation = binaryOperators[node.op_type()];
-        operations.push_back(Operation(operatorForOperation, inputsIdentifers, node.input_size(), node.output()[0]));
+        operations.push_back(Operation(operatorForOperation, nodeInputsIdentifers, node.input_size(), node.output()[0]));
     }
 }
 

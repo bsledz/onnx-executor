@@ -15,12 +15,7 @@ void Operation::perform(std::unordered_map<std::string, double>& terms)
 }
 
 Operation::Operation(Operator op, std::shared_ptr<std::string[]> inputsIdentifers, int inputsCount, std::string outputIdentifer)
-        : op(op)
-        , outputIdentifer(outputIdentifer)
-        , inputsCount(inputsCount)
-        , inputsIdentifers(inputsIdentifers)
+: op(op), outputIdentifer(outputIdentifer), inputsCount(inputsCount), inputsIdentifers(inputsIdentifers)
 {
-    if (inputsCount != 2) {
-        throw UnsupportedModel("Only binary operators are supported");
-    }
+    if (inputsCount != 2) throw UnsupportedModel("Only binary operators are supported");
 }
