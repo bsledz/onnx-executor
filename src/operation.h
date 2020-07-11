@@ -1,24 +1,19 @@
 #include <string>
 #include <memory>
+#include <functional>
 #include <unordered_map>
+
+using Operator = std::function<double(double, double)>;
 
 class Operation {
     std::shared_ptr<std::string[]> inputsIdentifers;
     int inputsCount;
 
     std::string outputIdentifer;
-    std::string type;
+    Operator op;
 
 public:
-    static double performBinaryOperation(std::string type, double l_val, double r_val);
-
     void perform(std::unordered_map<std::string, double>& terms);
 
-    Operation(std::string type, std::shared_ptr<std::string[]> inputsIdentifers, int inputsCount, std::string outputIdentifer)
-        : type(type)
-        , outputIdentifer(outputIdentifer)
-        , inputsCount(inputsCount)
-        , inputsIdentifers(inputsIdentifers)
-    {
-    }
+    Operation(Operator op, std::shared_ptr<std::string[]> inputsIdentifers, int inputsCount, std::string outputIdentifer);
 };

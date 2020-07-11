@@ -2,25 +2,25 @@
 #include <memory>
 #include <stdexcept>
 #include "operation.h"
+#include "executorExceptions.h"
 
-
-double Operation::performBinaryOperation(std::string type, double l_val, double r_val)
-{
-    if (type == "Add")
-        return l_val + r_val;
-    if (type == "Div")
-        return l_val / r_val;
-    throw std::logic_error("Unsupported operator: " + type);
-}
+using Operator = std::function<double(double, double)>;
 
 void Operation::perform(std::unordered_map<std::string, double>& terms)
 {
-    if (inputsCount != 2) {
-        throw std::logic_error("Only binary operations are supported");
-    }
-
     double l_val = terms[inputsIdentifers[0]];
     double r_val = terms[inputsIdentifers[1]];
 
-    terms.insert({ outputIdentifer, Operation::performBinaryOperation(type, l_val, r_val) });
+    terms.insert({this->outputIdentifer, this->op(l_val, r_val)});
+}
+
+Operation::Operation(Operator op, std::shared_ptr<std::string[]> inputsIdentifers, int inputsCount, std::string outputIdentifer)
+        : op(op)
+        , outputIdentifer(outputIdentifer)
+        , inputsCount(inputsCount)
+        , inputsIdentifers(inputsIdentifers)
+{
+    if (inputsCount != 2) {
+        throw UnsupportedModel("Only binary operators are supported");
+    }
 }
