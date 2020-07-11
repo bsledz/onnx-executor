@@ -46,7 +46,7 @@ int main(int argc, char** argv){
     try{
         parseAndValidateArguments(argc, argv, inputs, inputsCount);
         std::ifstream in(argv[1], std::ios_base::binary);
-        std::unique_ptr<Expression> expression(Expression::fromIstream(in, createSupportedOperators()));
+        std::unique_ptr<Expression> expression(Expression::fromIstream(in, onnx::ModelProto(), createSupportedOperators()));
         in.close();
         std::cout << expression->calculate(inputs, inputsCount) << std::endl;
     }catch(UnsupportedModel &exc){
