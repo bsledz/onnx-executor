@@ -21,4 +21,4 @@ RUN ./Release/tests
 
 RUN make
 
-CMD ./Release/onnx-executor ../
+CMD ./Release/onnx-executor
